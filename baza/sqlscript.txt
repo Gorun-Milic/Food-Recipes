@@ -1,0 +1,140 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema hrana
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema hrana
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `hrana` DEFAULT CHARACTER SET utf8 ;
+USE `hrana` ;
+
+-- -----------------------------------------------------
+-- Table `hrana`.`korisnik`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hrana`.`korisnik` (
+  `idkorisnik` INT NOT NULL AUTO_INCREMENT,
+  `korisnickoime` VARCHAR(45) NULL,
+  `lozinka` VARCHAR(45) NULL,
+  `visina` INT NULL,
+  `masa` INT NULL,
+  `godiste` INT NULL,
+  `ime` VARCHAR(45) NULL,
+  `prezime` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
+  `telefon` VARCHAR(45) NULL,
+  `bmi` INT NULL,
+  PRIMARY KEY (`idkorisnik`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hrana`.`namirnica`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hrana`.`namirnica` (
+  `idnamirnica` INT NOT NULL AUTO_INCREMENT,
+  `naziv` VARCHAR(45) NULL,
+  `vrsta` VARCHAR(45) NULL,
+  `kalorije` INT NULL,
+  `cena` INT NULL,
+  `kolicina` INT NULL,
+  `idkorisnik` INT NULL,
+  PRIMARY KEY (`idnamirnica`),
+  INDEX `fk_namirnica_korisnik_idx` (`idkorisnik` ASC) VISIBLE,
+  CONSTRAINT `fk_namirnica_korisnik`
+    FOREIGN KEY (`idkorisnik`)
+    REFERENCES `hrana`.`korisnik` (`idkorisnik`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hrana`.`recept`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hrana`.`recept` (
+  `idrecept` INT NOT NULL AUTO_INCREMENT,
+  `naziv` VARCHAR(45) NULL,
+  `opis` VARCHAR(300) NULL,
+  `cena` INT NULL,
+  `kalorije` INT NULL,
+  `idkorisnik` INT NULL,
+  PRIMARY KEY (`idrecept`),
+  INDEX `fk_recept_korisnik1_idx` (`idkorisnik` ASC) VISIBLE,
+  CONSTRAINT `fk_recept_korisnik1`
+    FOREIGN KEY (`idkorisnik`)
+    REFERENCES `hrana`.`korisnik` (`idkorisnik`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hrana`.`priprema`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hrana`.`priprema` (
+  `idpriprema` INT NOT NULL AUTO_INCREMENT,
+  `datum` DATE NULL,
+  `vreme` DATETIME NULL,
+  `idrecept` INT NULL,
+  PRIMARY KEY (`idpriprema`),
+  INDEX `fk_priprema_recept1_idx` (`idrecept` ASC) VISIBLE,
+  CONSTRAINT `fk_priprema_recept1`
+    FOREIGN KEY (`idrecept`)
+    REFERENCES `hrana`.`recept` (`idrecept`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hrana`.`korak`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hrana`.`korak` (
+  `idkorak` INT NOT NULL AUTO_INCREMENT,
+  `opis` VARCHAR(300) NULL,
+  `trajanje` INT NULL,
+  `paralelno` INT NULL,
+  `idrecept` INT NULL,
+  PRIMARY KEY (`idkorak`),
+  INDEX `fk_korak_recept1_idx` (`idrecept` ASC) VISIBLE,
+  CONSTRAINT `fk_korak_recept1`
+    FOREIGN KEY (`idrecept`)
+    REFERENCES `hrana`.`recept` (`idrecept`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `hrana`.`receptnamirnica`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hrana`.`receptnamirnica` (
+  `idreceptnamirnica` INT NOT NULL AUTO_INCREMENT,
+  `kolicina` INT NULL,
+  `idrecept` INT NULL,
+  `idnamirnica` INT NULL,
+  PRIMARY KEY (`idreceptnamirnica`),
+  INDEX `fk_recept_has_namirnica_namirnica1_idx` (`idnamirnica` ASC) VISIBLE,
+  INDEX `fk_recept_has_namirnica_recept1_idx` (`idrecept` ASC) VISIBLE,
+  CONSTRAINT `fk_recept_has_namirnica_recept1`
+    FOREIGN KEY (`idrecept`)
+    REFERENCES `hrana`.`recept` (`idrecept`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_recept_has_namirnica_namirnica1`
+    FOREIGN KEY (`idnamirnica`)
+    REFERENCES `hrana`.`namirnica` (`idnamirnica`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
